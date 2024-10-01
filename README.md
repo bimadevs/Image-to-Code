@@ -25,3 +25,5 @@ streamlit run app.py
 Before running the app, you need to configure your API key in the `app.py` file. Replace `YOUR GEMINI KEY` with your actual API key to enable the AI functionalities.
 
 You can also select the Gemini model you want and even tell Gemini to use a specific CSS framework.
+
+Don't forget to give me star ⭐
