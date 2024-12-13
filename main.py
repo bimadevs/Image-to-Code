@@ -48,6 +48,83 @@ model = genai.GenerativeModel(
 # Mulai sesi chat
 sesi_chat = model.start_chat(history=[])
 
+# Tambahkan CSS kustom untuk desain modern
+def tambah_css():
+    st.markdown("""
+    <style>
+    /* Gaya Umum */
+    .stApp {
+        background-color: #0f172a;  /* Latar belakang gelap */
+        color: #e2e8f0;  /* Warna teks terang */
+    }
+    
+    /* Header */
+    .header-container {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .header-container h1 {
+        color: #4fd1c5;  /* Warna judul modern */
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .header-container h3 {
+        color: #94a3b8;
+        font-size: 1rem;
+    }
+    
+    /* Tombol */
+    .stButton>button {
+        background-color: #4fd1c5 !important;
+        color: #0f172a !important;
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    
+    .stButton>button:hover {
+        background-color: #2dd4bf !important;
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* File Uploader */
+    .stFileUploader>div>div>div {
+        background-color: #1e293b;
+        border: 2px dashed #4fd1c5;
+        border-radius: 15px;
+        padding: 1rem;
+        color: #94a3b8;
+    }
+    
+    /* Kotak Kode */
+    .stCodeBlock {
+        background-color: #1e293b !important;
+        border-radius: 15px;
+        padding: 1rem;
+        border: 1px solid #4fd1c5;
+    }
+    
+    /* Animasi */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .animated-container {
+        animation: fadeIn 0.5s ease-out;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 # Fungsi untuk mengirim pesan ke model
 def kirim_pesan_ke_model(pesan, jalur_gambar):
     try:
@@ -62,26 +139,48 @@ def kirim_pesan_ke_model(pesan, jalur_gambar):
         st.error(f"Terjadi kesalahan saat memproses gambar: {e}")
         return ""
 
-# Aplikasi Streamlit utama
-st.set_page_config(
-    page_title="Konversi UI ke Kode", 
-    page_icon="💻", 
-    layout="wide"
-)
-
 def main():
-    st.title("Konversi Tangkapan Layar UI Menjadi Kode Website 🖼️➡️💻")
-    st.markdown("### Ubah tangkapan layar UI menjadi HTML responsif")
+    # Tambahkan CSS kustom
+    tambah_css()
 
-    # Pilih kerangka kerja
-    kerangka_kerja_dipilih = st.selectbox(
-        "Pilih Kerangka Kerja CSS", 
-        ["Tailwind", "Bootstrap", "Bulma", "Foundation"]
+    # Konfigurasi halaman
+    st.set_page_config(
+        page_title="UI to Code Pro", 
+        page_icon="💻", 
+        layout="wide"
     )
+
+    # Container header
+    st.markdown('<div class="header-container animated-container">', unsafe_allow_html=True)
+    st.markdown('<h1>UI to Code Pro 🚀</h1>', unsafe_allow_html=True)
+    st.markdown('<h3>Ubah Tangkapan Layar Menjadi Kode Website Instan</h3>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Kolom untuk tata letak
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        # Pilih kerangka kerja
+        kerangka_kerja_dipilih = st.selectbox(
+            "🎨 Pilih Kerangka Kerja CSS", 
+            ["Tailwind", "Bootstrap", "Bulma", "Foundation"],
+            help="Pilih framework CSS untuk menghasilkan kode"
+        )
+
+    with col2:
+        # Info tambahan
+        st.markdown("""
+        <div style="background-color: #1e293b; padding: 15px; border-radius: 10px; color: #94a3b8;">
+        💡 Tips:<br>
+        • Gunakan gambar UI yang jelas
+        • Pastikan kontras warna baik
+        • Hindari gambar terlalu kompleks
+        </div>
+        """, unsafe_allow_html=True)
 
     # Unggah berkas gambar
     berkas_unggahan = st.file_uploader(
-        "Unggah Tangkapan Layar UI", 
+        "📤 Unggah Tangkapan Layar UI", 
         type=["jpg", "jpeg", "png"],
         help="Unggah tangkapan layar UI yang ingin diubah menjadi kode"
     )
@@ -100,41 +199,41 @@ def main():
             gambar.save(jalur_gambar_sementara, format="JPEG")
 
             # Tampilkan gambar
-            st.image(gambar, caption='Gambar Yang Diunggah.', use_column_width=True)
+            st.image(gambar, caption='Gambar Yang Diunggah', use_column_width=True)
 
             # Tombol generasi
-            if st.button("Buat Kode!"):
-                st.write("🧑‍💻 Menganalisis Antarmuka Pengguna...")
-                
-                # Deskripsi UI
-                prompt_deskripsi = "Jelaskan antarmuka pengguna ini secara detail. Sebutkan elemen UI dengan nama dan kotak pembatas dalam format: [nama objek (y_min, x_min, y_max, x_max)]. Jelaskan warna dan tata letak."
-                deskripsi = kirim_pesan_ke_model(prompt_deskripsi, jalur_gambar_sementara)
-                st.write(deskripsi)
-
-                # Perbaiki deskripsi
-                st.write("🔍 Menyempurnakan deskripsi...")
-                prompt_perbaikan = f"Validasi dan perbaiki deskripsi antarmuka pengguna ini. Bandingkan dengan gambar asli untuk akurasi: {deskripsi}"
-                deskripsi_disempurnakan = kirim_pesan_ke_model(prompt_perbaikan, jalur_gambar_sementara)
-                
-                # Buat HTML
-                st.write("🛠️ Membuat website responsif...")
-                prompt_html = f"Buat HTML responsif menggunakan CSS {kerangka_kerja_dipilih}. Cocokkan warna dan tata letak UI asli secara tepat. Tanpa komentar, penejesan apa pun hanya kode html saja. HTML murni dengan CSS inline. Deskripsi: {deskripsi_disempurnakan}"
-                html_awal = kirim_pesan_ke_model(prompt_html, jalur_gambar_sementara)
-                
-                # Tampilkan kode HTML
-                st.code(html_awal, language='html')
-                
-                # Simpan berkas HTML
-                with open("ui_dihasilkan.html", "w", encoding='utf-8') as f:
-                    f.write(html_awal)
-                
-                # Tombol unduh
-                st.download_button(
-                    label="Unduh HTML", 
-                    data=html_awal, 
-                    file_name="ui_dihasilkan.html", 
-                    mime="text/html"
-                )
+            if st.button("✨ Hasilkan Kode"):
+                with st.spinner('Sedang menganalisis dan membuat kode...'):
+                    st.write("🧑‍💻 Menganalisis Antarmuka Pengguna...")
+                    
+                    # Deskripsi UI
+                    prompt_deskripsi = "Jelaskan antarmuka pengguna ini secara detail. Sebutkan elemen UI dengan nama dan kotak pembatas dalam format: [nama objek (y_min, x_min, y_max, x_max)]. Jelaskan warna dan tata letak."
+                    deskripsi = kirim_pesan_ke_model(prompt_deskripsi, jalur_gambar_sementara)
+                    
+                    # Perbaiki deskripsi
+                    st.write("🔍 Menyempurnakan deskripsi...")
+                    prompt_perbaikan = f"Validasi dan perbaiki deskripsi antarmuka pengguna ini. Bandingkan dengan gambar asli untuk akurasi: {deskripsi}"
+                    deskripsi_disempurnakan = kirim_pesan_ke_model(prompt_perbaikan, jalur_gambar_sementara)
+                    
+                    # Buat HTML
+                    st.write("🛠️ Membuat website responsif...")
+                    prompt_html = f"Buat HTML responsif menggunakan CSS {kerangka_kerja_dipilih}. Cocokkan warna dan tata letak UI asli secara tepat. Tanpa komentar dan penjelasan hanya code html saja, hindari penggunakan ```html. dan ``` di akhir. HTML murni dengan CSS inline. Deskripsi: {deskripsi_disempurnakan}"
+                    html_awal = kirim_pesan_ke_model(prompt_html, jalur_gambar_sementara)
+                    
+                    # Tampilkan kode HTML
+                    st.code(html_awal, language='html')
+                    
+                    # Simpan berkas HTML
+                    with open("ui_dihasilkan.html", "w", encoding='utf-8') as f:
+                        f.write(html_awal)
+                    
+                    # Tombol unduh
+                    st.download_button(
+                        label="⬇️ Unduh HTML", 
+                        data=html_awal, 
+                        file_name="index.html", 
+                        mime="text/html"
+                    )
 
         except Exception as e:
             logger.error(f"Kesalahan pemrosesan gambar: {e}")
