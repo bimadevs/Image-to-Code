@@ -212,7 +212,7 @@ def main():
                 # html_awal = kirim_pesan_ke_model(prompt_html, jalur_gambar_sementara)
                 
                 # Tampilkan kode HTML
-                st.code(html_awal, language='html')
+                st.code(refined_html, language='html')
                 
                 # Simpan berkas HTML
                 with open("ui_dihasilkan.html", "w", encoding='utf-8') as f:
