@@ -2,109 +2,143 @@ import streamlit as st
 import pathlib
 from PIL import Image
 import google.generativeai as genai
+import logging
 
-# Configure the API key directly in the script
-API_KEY = 'AIzaSyDvln1q95RRWxaER0fSMlqoaWsA1UU6lvs' #Change this API_KEY to your API KEY
+# Konfigurasi pencatatan
+logging.basicConfig(
+    level=logging.INFO, 
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Konfigurasi API key langsung di dalam skrip
+API_KEY = 'AIzaSyDvln1q95RRWxaER0fSMlqoaWsA1UU6lvs'  # Silakan ganti dengan API KEY Anda
 genai.configure(api_key=API_KEY)
 
-# Generation configuration
-generation_config = {
-    "temperature": 1,
-    "top_p": 0.95,
-    "top_k": 64,
+# Konfigurasi generasi
+konfigurasi_generasi = {
+    "temperature": 0.7,
+    "top_p": 0.85,
+    "top_k": 40,
     "max_output_tokens": 8192,
     "response_mime_type": "text/plain",
 }
 
-# Safety settings
-safety_settings = [
-    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+# Pengaturan keamanan
+pengaturan_keamanan = [
+    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
 ]
 
-# Model name
-MODEL_NAME = "gemini-1.5-pro-latest"
+# Nama model
+NAMA_MODEL = "gemini-1.5-pro-latest"
 
-# Framework selection (e.g., Tailwind, Bootstrap, etc.)
-framework = "Tailwind"  # Change this to "Bootstrap" or any other framework as needed
+# Pilihan kerangka kerja
+kerangka_kerja = "Tailwind"
 
-# Create the model
+# Buat model
 model = genai.GenerativeModel(
-    model_name=MODEL_NAME,
-    safety_settings=safety_settings,
-    generation_config=generation_config,
+    model_name=NAMA_MODEL,
+    safety_settings=pengaturan_keamanan,
+    generation_config=konfigurasi_generasi,
 )
 
-# Start a chat session
-chat_session = model.start_chat(history=[])
+# Mulai sesi chat
+sesi_chat = model.start_chat(history=[])
 
-# Function to send a message to the model
-def send_message_to_model(message, image_path):
-    image_input = {
-        'mime_type': 'image/jpeg',
-        'data': pathlib.Path(image_path).read_bytes()
-    }
-    response = chat_session.send_message([message, image_input])
-    return response.text
+# Fungsi untuk mengirim pesan ke model
+def kirim_pesan_ke_model(pesan, jalur_gambar):
+    try:
+        input_gambar = {
+            'mime_type': 'image/jpeg',
+            'data': pathlib.Path(jalur_gambar).read_bytes()
+        }
+        respon = sesi_chat.send_message([pesan, input_gambar])
+        return respon.text
+    except Exception as e:
+        logger.error(f"Kesalahan saat mengirim pesan: {e}")
+        st.error(f"Terjadi kesalahan saat memproses gambar: {e}")
+        return ""
 
-# Streamlit app
-st.set_page_config(page_title="UI to Code")
+# Aplikasi Streamlit utama
+st.set_page_config(
+    page_title="Konversi UI ke Kode", 
+    page_icon="💻", 
+    layout="wide"
+)
+
 def main():
-    st.title("U and I Code, UI to Code 👨‍💻 ")
-    st.subheader('Made with ❤️ by [BimaDev](https://bimadev.xyz)')
+    st.title("Konversi Tangkapan Layar UI Menjadi Kode Website 🖼️➡️💻")
+    st.markdown("### Ubah tangkapan layar UI menjadi HTML responsif")
 
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+    # Pilih kerangka kerja
+    kerangka_kerja_dipilih = st.selectbox(
+        "Pilih Kerangka Kerja CSS", 
+        ["Tailwind", "Bootstrap", "Bulma", "Foundation"]
+    )
 
-    if uploaded_file is not None:
+    # Unggah berkas gambar
+    berkas_unggahan = st.file_uploader(
+        "Unggah Tangkapan Layar UI", 
+        type=["jpg", "jpeg", "png"],
+        help="Unggah tangkapan layar UI yang ingin diubah menjadi kode"
+    )
+
+    if berkas_unggahan is not None:
         try:
-            # Load and display the image
-            image = Image.open(uploaded_file)
-            st.image(image, caption='Uploaded Image.', use_column_width=True)
+            # Muat dan tampilkan gambar
+            gambar = Image.open(berkas_unggahan)
+            
+            # Konversi ke RGB jika perlu
+            if gambar.mode == 'RGBA':
+                gambar = gambar.convert('RGB')
 
-            # Convert image to RGB mode if it has an alpha channel
-            if image.mode == 'RGBA':
-                image = image.convert('RGB')
+            # Simpan gambar sementara
+            jalur_gambar_sementara = pathlib.Path("gambar_sementara.jpg")
+            gambar.save(jalur_gambar_sementara, format="JPEG")
 
-            # Save the uploaded image temporarily
-            temp_image_path = pathlib.Path("temp_image.jpg")
-            image.save(temp_image_path, format="JPEG")
+            # Tampilkan gambar
+            st.image(gambar, caption='Gambar Yang Diunggah.', use_column_width=True)
 
-            # Generate UI description
-            if st.button("Generate!"):
-                st.write("🧑‍💻 Looking at your UI...")
-                prompt = "Describe this UI in accurate details. When you reference a UI element put its name and bounding box in the format: [object name (y_min, x_min, y_max, x_max)]. Also Describe the color of the elements."
-                description = send_message_to_model(prompt, temp_image_path)
-                st.write(description)
+            # Tombol generasi
+            if st.button("Buat Kode!"):
+                st.write("🧑‍💻 Menganalisis Antarmuka Pengguna...")
+                
+                # Deskripsi UI
+                prompt_deskripsi = "Jelaskan antarmuka pengguna ini secara detail. Sebutkan elemen UI dengan nama dan kotak pembatas dalam format: [nama objek (y_min, x_min, y_max, x_max)]. Jelaskan warna dan tata letak."
+                deskripsi = kirim_pesan_ke_model(prompt_deskripsi, jalur_gambar_sementara)
+                st.write(deskripsi)
 
-                # Refine the description
-                st.write("🔍 Refining description with visual comparison...")
-                refine_prompt = f"Compare the described UI elements with the provided image and identify any missing elements or inaccuracies. Also Describe the color of the elements. Provide a refined and accurate description of the UI elements based on this comparison. Here is the initial description: {description}"
-                refined_description = send_message_to_model(refine_prompt, temp_image_path)
-                st.write(refined_description)
+                # Perbaiki deskripsi
+                st.write("🔍 Menyempurnakan deskripsi...")
+                prompt_perbaikan = f"Validasi dan perbaiki deskripsi antarmuka pengguna ini. Bandingkan dengan gambar asli untuk akurasi: {deskripsi}"
+                deskripsi_disempurnakan = kirim_pesan_ke_model(prompt_perbaikan, jalur_gambar_sementara)
+                
+                # Buat HTML
+                st.write("🛠️ Membuat website responsif...")
+                prompt_html = f"Buat HTML responsif menggunakan CSS {kerangka_kerja_dipilih}. Cocokkan warna dan tata letak UI asli secara tepat. Tanpa komentar. HTML murni dengan CSS inline. Deskripsi: {deskripsi_disempurnakan}"
+                html_awal = kirim_pesan_ke_model(prompt_html, jalur_gambar_sementara)
+                
+                # Tampilkan kode HTML
+                st.code(html_awal, language='html')
+                
+                # Simpan berkas HTML
+                with open("ui_dihasilkan.html", "w", encoding='utf-8') as f:
+                    f.write(html_awal)
+                
+                # Tombol unduh
+                st.download_button(
+                    label="Unduh HTML", 
+                    data=html_awal, 
+                    file_name="ui_dihasilkan.html", 
+                    mime="text/html"
+                )
 
-                # Generate HTML
-                st.write("🛠️ Generating website...")
-                html_prompt = f"Create an HTML file based on the following UI description, using the UI elements described in the previous response. Include {framework} CSS within the HTML file to style the elements. Make sure the colors used are the same as the original UI. The UI needs to be responsive and mobile-first, matching the original UI as closely as possible. Do not include any explanations or comments. Avoid using ```html. and ``` at the end. ONLY return the HTML code with inline CSS. Here is the refined description: {refined_description}"
-                initial_html = send_message_to_model(html_prompt, temp_image_path)
-                st.code(initial_html, language='html')
-
-                # Refine HTML
-                st.write("🔧 Refining website...")
-                refine_html_prompt = f"Validate the following HTML code based on the UI description and image and provide a refined version of the HTML code with {framework} CSS that improves accuracy, responsiveness, and adherence to the original design. ONLY return the refined HTML code with inline CSS. Avoid using ```html. and ``` at the end. Here is the initial HTML: {initial_html}"
-                refined_html = send_message_to_model(refine_html_prompt, temp_image_path)
-                st.code(refined_html, language='html')
-
-                # Save the refined HTML to a file
-                with open("index.html", "w") as file:
-                    file.write(refined_html)
-                st.success("HTML file 'index.html' has been created.")
-
-                # Provide download link for HTML
-                st.download_button(label="Download HTML", data=refined_html, file_name="index.html", mime="text/html")
         except Exception as e:
-            st.error(f"An error occurred: {e}")
+            logger.error(f"Kesalahan pemrosesan gambar: {e}")
+            st.error(f"Terjadi kesalahan: {e}")
 
 if __name__ == "__main__":
     main()
