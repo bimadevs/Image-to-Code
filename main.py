@@ -179,7 +179,7 @@ def main():
             gambar.save(jalur_gambar_sementara, format="JPEG")
 
             # Tampilkan gambar
-            st.image(gambar, caption='Gambar Yang Diunggah.', use_column_width=True)
+            st.image(gambar, caption='Gambar Yang Diunggah.', use_container_width=True)
 
             # Tombol generasi
             if st.button("Buat Kode!"):
