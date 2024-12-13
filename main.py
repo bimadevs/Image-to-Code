@@ -216,12 +216,12 @@ def main():
                 
                 # Simpan berkas HTML
                 with open("ui_dihasilkan.html", "w", encoding='utf-8') as f:
-                    f.write(refined_htm)
+                    f.write(refined_html)
                 
                 # Tombol unduh
                 st.download_button(
                     label="Unduh HTML", 
-                    data=refined_htm, 
+                    data=refined_html, 
                     file_name="index.html", 
                     mime="text/html"
                 )
