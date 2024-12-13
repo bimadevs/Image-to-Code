@@ -194,24 +194,35 @@ def main():
                 st.write("🔍 Menyempurnakan deskripsi...")
                 prompt_perbaikan = f"Validasi dan perbaiki deskripsi antarmuka pengguna ini. Bandingkan dengan gambar asli untuk akurasi: {deskripsi}"
                 deskripsi_disempurnakan = kirim_pesan_ke_model(prompt_perbaikan, jalur_gambar_sementara)
+
+                  # Generate HTML
+                st.write("🛠️ Generating website...")
+                html_prompt = f"Create an HTML file based on the following UI description, using the UI elements described in the previous response. Include {framework} CSS within the HTML file to style the elements. Make sure the colors used are the same as the original UI. The UI needs to be responsive and mobile-first, matching the original UI as closely as possible. Do not include any explanations or comments. Avoid using ```html. and ``` at the end. ONLY return the HTML code with inline CSS. Here is the refined description: {deskripsi_disempurnakan}"
+                initial_html = send_message_to_model(html_prompt, jalur_gambar_sementara)
+                st.code(initial_html, language='html')
+
+                # Refine HTML
+                st.write("🔧 Refining website...")
+                refine_html_prompt = f"Validate the following HTML code based on the UI description and image and provide a refined version of the HTML code with {framework} CSS that improves accuracy, responsiveness, and adherence to the original design. ONLY return the refined HTML code with inline CSS. Avoid using ```html. and ``` at the end. Here is the initial HTML: {initial_html}"
+                refined_html = send_message_to_model(refine_html_prompt, jalur_gambar_sementara)
                 
                 # Buat HTML
-                st.write("🛠️ Membuat website responsif...")
-                prompt_html = f"Buat HTML responsif menggunakan CSS {kerangka_kerja_dipilih}. Cocokkan warna dan tata letak UI asli secara tepat. Tanpa komentar dan penjelasan apa pun hanya berikan output code html saja, jangan pernah mengeluarkan output  ```html diawal dan ``` di akhir. HTML murni dengan CSS inline. Deskripsi: {deskripsi_disempurnakan}"
-                html_awal = kirim_pesan_ke_model(prompt_html, jalur_gambar_sementara)
+                # st.write("🛠️ Membuat website responsif...")
+                # prompt_html = f"Buat HTML responsif menggunakan CSS {kerangka_kerja_dipilih}. Cocokkan warna dan tata letak UI asli secara tepat. Tanpa komentar dan penjelasan apa pun hanya berikan output code html saja, jangan pernah mengeluarkan output  ```html diawal dan ``` di akhir. HTML murni dengan CSS inline. Deskripsi: {deskripsi_disempurnakan}"
+                # html_awal = kirim_pesan_ke_model(prompt_html, jalur_gambar_sementara)
                 
                 # Tampilkan kode HTML
                 st.code(html_awal, language='html')
                 
                 # Simpan berkas HTML
                 with open("ui_dihasilkan.html", "w", encoding='utf-8') as f:
-                    f.write(html_awal)
+                    f.write(refined_htm)
                 
                 # Tombol unduh
                 st.download_button(
                     label="Unduh HTML", 
-                    data=html_awal, 
-                    file_name="ui_dihasilkan.html", 
+                    data=refined_htm, 
+                    file_name="index.html", 
                     mime="text/html"
                 )
 
