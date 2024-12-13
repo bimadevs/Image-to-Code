@@ -153,9 +153,9 @@ def main():
     st.markdown("### Ubah tangkapan layar UI menjadi HTML responsif")
 
     # Pilih kerangka kerja
-    kerangka_kerja_dipilih = st.selectbox(
+    framework = st.selectbox(
         "Pilih Kerangka Kerja CSS", 
-        ["Tailwind", "Bootstrap", "Bulma", "Foundation"]
+        ["Tailwind", "Bootstrap", "Bulma", "Vanilla CSS"]
     )
 
     # Unggah berkas gambar
