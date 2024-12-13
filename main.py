@@ -17,7 +17,7 @@ genai.configure(api_key=API_KEY)
 
 # Konfigurasi generasi
 konfigurasi_generasi = {
-    "temperature": 0.7,
+    "temperature": 0,
     "top_p": 0.85,
     "top_k": 40,
     "max_output_tokens": 8192,
