@@ -48,6 +48,83 @@ model = genai.GenerativeModel(
 # Mulai sesi chat
 sesi_chat = model.start_chat(history=[])
 
+def css():
+    st.markdown("""
+    <style>
+    /* Gaya Umum */
+    .stApp {
+        background-color: #0f172a;  /* Latar belakang gelap */
+        color: #e2e8f0;  /* Warna teks terang */
+    }
+    
+    /* Header */
+    .header-container {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .header-container h1 {
+        color: #4fd1c5;  /* Warna judul modern */
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .header-container h3 {
+        color: #94a3b8;
+        font-size: 1rem;
+    }
+    
+    /* Tombol */
+    .stButton>button {
+        background-color: #4fd1c5 !important;
+        color: #0f172a !important;
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+    }
+    
+    .stButton>button:hover {
+        background-color: #2dd4bf !important;
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* File Uploader */
+    .stFileUploader>div>div>div {
+        background-color: #1e293b;
+        border: 2px dashed #4fd1c5;
+        border-radius: 15px;
+        padding: 1rem;
+        color: #94a3b8;
+    }
+    
+    /* Kotak Kode */
+    .stCodeBlock {
+        background-color: #1e293b !important;
+        border-radius: 15px;
+        padding: 1rem;
+        border: 1px solid #4fd1c5;
+    }
+    
+    /* Animasi */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .animated-container {
+        animation: fadeIn 0.5s ease-out;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+
 # Fungsi untuk mengirim pesan ke model
 def kirim_pesan_ke_model(pesan, jalur_gambar):
     try:
@@ -70,6 +147,8 @@ st.set_page_config(
 )
 
 def main():
+    css()
+    
     st.title("Konversi Tangkapan Layar UI Menjadi Kode Website 🖼️➡️💻")
     st.markdown("### Ubah tangkapan layar UI menjadi HTML responsif")
 
