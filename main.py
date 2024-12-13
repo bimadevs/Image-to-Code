@@ -197,7 +197,7 @@ def main():
                 
                 # Buat HTML
                 st.write("🛠️ Membuat website responsif...")
-                prompt_html = f"Buat HTML responsif menggunakan CSS {kerangka_kerja_dipilih}. Cocokkan warna dan tata letak UI asli secara tepat. Tanpa komentar dan penjelasan apa pun hanya berikan output code html saja, hindari penggunaan  ```html. dan ``` di akhir. HTML murni dengan CSS inline. Deskripsi: {deskripsi_disempurnakan}"
+                prompt_html = f"Buat HTML responsif menggunakan CSS {kerangka_kerja_dipilih}. Cocokkan warna dan tata letak UI asli secara tepat. Tanpa komentar dan penjelasan apa pun hanya berikan output code html saja, jangan pernah mengeluarkan output  ```html diawal dan ``` di akhir. HTML murni dengan CSS inline. Deskripsi: {deskripsi_disempurnakan}"
                 html_awal = kirim_pesan_ke_model(prompt_html, jalur_gambar_sementara)
                 
                 # Tampilkan kode HTML
