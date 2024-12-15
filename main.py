@@ -50,14 +50,16 @@ def send_message_to_model(message, image_path):
     return response.text
 
 # Streamlit app
-def main():
-    st.title("Gemini 1.5 Pro, UI to Code 👨‍💻 ")
-    st.subheader('Made with ❤️ by [Skirano](https://x.com/skirano)')
+st.set_page_config(page_title="Modern UI to Code Tool", layout="centered")
+st.title("Modern UI to Code Tool")
+st.markdown("An intuitive tool to transform UI images into clean, responsive code using advanced AI.")
 
-    frameworks = ["Tailwind", "Bootstrap", "Materialize"]
-    selected_framework = st.selectbox("Choose your framework", frameworks)
+# Framework selection
+frameworks = ["Tailwind CSS", "Bootstrap", "Materialize"]
+selected_framework = st.radio("Select your preferred CSS framework:", frameworks, horizontal=True)
 
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+# Image upload
+uploaded_file = st.file_uploader("Upload an image of your UI design (JPG, JPEG, PNG):", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
         try:
