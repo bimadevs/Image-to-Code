@@ -4,7 +4,7 @@ from PIL import Image
 import google.generativeai as genai
 
 # Configure the API key directly in the script
-API_KEY = 'AIzaSyCB7RmD_g66DsPxSAs38dydtmTeVdQ_oVA'
+API_KEY = 'AIzaSyDvln1q95RRWxaER0fSMlqoaWsA1UU6lvs'
 genai.configure(api_key=API_KEY)
 
 # Generation configuration
