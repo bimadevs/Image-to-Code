@@ -179,7 +179,7 @@ def main():
             # Tampilkan gambar
             st.image(gambar, caption='Gambar Yang Diunggah.', use_container_width=True)
 
-                       if st.button("Generate!"):
+            if st.button("Generate!"):
                 st.write("🧑‍💻 Looking at your UI...")
                 prompt = "Describe this UI in accurate details. When you reference a UI element put its name and bounding box in the format: [object name (y_min, x_min, y_max, x_max)]. Also Describe the color of the elements."
                 description = send_message_to_model(prompt, temp_image_path)
