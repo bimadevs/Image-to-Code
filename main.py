@@ -51,7 +51,7 @@ def send_message_to_model(message, image_path):
 def main():
     st.set_page_config(page_title="Modern UI to Code Tool", layout="centered")
     st.title("Modern UI From Your Image")
-    st.markdown('Made with ❤️ by [BimaDev](https://instagram.com/biimaa_jo)')
+    st.subheader('Made with ❤️ by [BimaDev](https://instagram.com/biimaa_jo)')
 
     # Framework selection (e.g., Tailwind, Bootstrap, etc.)
     frameworks = ["Tailwind", "Bootstrap", "Materialize", "Bulma"]
