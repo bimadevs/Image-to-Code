@@ -57,7 +57,7 @@ def main():
     frameworks = ["Tailwind", "Bootstrap", "Materialize", "Bulma"]
     selected_framework = st.radio("Pilih Framework yang ingin kamu gunakan: ",frameworks)
 
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+    uploaded_file = st.file_uploader("Pilih Gambar Kamu...", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
         try:
