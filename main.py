@@ -2,184 +2,76 @@ import streamlit as st
 import pathlib
 from PIL import Image
 import google.generativeai as genai
-import logging
 
-# Konfigurasi pencatatan
-logging.basicConfig(
-    level=logging.INFO, 
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-# Konfigurasi API key langsung di dalam skrip
-API_KEY = 'AIzaSyDvln1q95RRWxaER0fSMlqoaWsA1UU6lvs'  # Silakan ganti dengan API KEY Anda
+# Configure the API key directly in the script
+API_KEY = 'AIzaSyCB7RmD_g66DsPxSAs38dydtmTeVdQ_oVA'
 genai.configure(api_key=API_KEY)
 
-# Konfigurasi generasi
+# Generation configuration
 generation_config = {
-    "temperature": 0,
-    "top_p": 0.85,
-    "top_k": 40,
+    "temperature": 1,
+    "top_p": 0.95,
+    "top_k": 64,
     "max_output_tokens": 8192,
     "response_mime_type": "text/plain",
 }
 
-# Pengaturan keamanan
-pengaturan_keamanan = [
-    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+# Safety settings
+safety_settings = [
+    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
+# Model name
+MODEL_NAME = "gemini-2.0-flash-exp"
 
+# Framework selection (e.g., Tailwind, Bootstrap, etc.)
+framework = "Tailwind"  # Change this to "Bootstrap" or any other framework as needed
 
-# Pilihan kerangka kerja
-kerangka_kerja = "Tailwind"
-
-# Buat model
+# Create the model
 model = genai.GenerativeModel(
-  model_name="gemini-2.0-flash-exp",
-  generation_config=generation_config,
+    model_name=MODEL_NAME,
+    safety_settings=safety_settings,
+    generation_config=generation_config,
 )
 
-# Mulai sesi chat
-sesi_chat = model.start_chat(history=[])
+# Start a chat session
+chat_session = model.start_chat(history=[])
 
-def css():
-    st.markdown("""
-    <style>
-    /* Gaya Umum */
-    .stApp {
-        background-color: #0f172a;  /* Latar belakang gelap */
-        color: #e2e8f0;  /* Warna teks terang */
+# Function to send a message to the model
+def send_message_to_model(message, image_path):
+    image_input = {
+        'mime_type': 'image/jpeg',
+        'data': pathlib.Path(image_path).read_bytes()
     }
-    
-    /* Header */
-    .header-container {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        padding: 2rem;
-        border-radius: 15px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        margin-bottom: 1.5rem;
-        text-align: center;
-    }
-    
-    .header-container h1 {
-        color: #4fd1c5;  /* Warna judul modern */
-        font-size: 2.5rem;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-    }
-    
-    .header-container h3 {
-        color: #94a3b8;
-        font-size: 1rem;
-    }
-    
-    /* Tombol */
-    .stButton>button {
-        background-color: #4fd1c5 !important;
-        color: #0f172a !important;
-        border: none;
-        border-radius: 10px;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-    
-    .stButton>button:hover {
-        background-color: #2dd4bf !important;
-        transform: scale(1.05);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-    
-    /* File Uploader */
-    .stFileUploader>div>div>div {
-        background-color: #1e293b;
-        border: 2px dashed #4fd1c5;
-        border-radius: 15px;
-        padding: 1rem;
-        color: #94a3b8;
-    }
-    
-    /* Kotak Kode */
-    .stCodeBlock {
-        background-color: #1e293b !important;
-        border-radius: 15px;
-        padding: 1rem;
-        border: 1px solid #4fd1c5;
-    }
-    
-    /* Animasi */
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-    
-    .animated-container {
-        animation: fadeIn 0.5s ease-out;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+    response = chat_session.send_message([message, image_input])
+    return response.text
 
-
-# Fungsi untuk mengirim pesan ke model
-def kirim_pesan_ke_model(pesan, jalur_gambar):
-    try:
-        input_gambar = {
-            'mime_type': 'image/jpeg',
-            'data': pathlib.Path(jalur_gambar).read_bytes()
-        }
-        respon = sesi_chat.send_message([pesan, input_gambar])
-        return respon.text
-    except Exception as e:
-        logger.error(f"Kesalahan saat mengirim pesan: {e}")
-        st.error(f"Terjadi kesalahan saat memproses gambar: {e}")
-        return ""
-
-# Aplikasi Streamlit utama
-st.set_page_config(
-    page_title="Konversi UI ke Kode", 
-    page_icon="💻", 
-    layout="wide"
-)
-
+# Streamlit app
 def main():
-    css()
-    
-    st.title("Konversi Tangkapan Layar UI Menjadi Kode Website 🖼️➡️💻")
-    st.markdown("### Ubah tangkapan layar UI menjadi HTML responsif")
+    st.title("Gemini 1.5 Pro, UI to Code 👨‍💻 ")
+    st.subheader('Made with ❤️ by [Skirano](https://x.com/skirano)')
 
-    # Pilih kerangka kerja
-    framework = st.selectbox(
-        "Pilih Kerangka Kerja CSS", 
-        ["Tailwind", "Bootstrap", "Bulma", "Vanilla CSS"]
-    )
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
-    # Unggah berkas gambar
-    berkas_unggahan = st.file_uploader(
-        "Unggah Tangkapan Layar UI", 
-        type=["jpg", "jpeg", "png"],
-        help="Unggah tangkapan layar UI yang ingin diubah menjadi kode"
-    )
-
-    if berkas_unggahan is not None:
+    if uploaded_file is not None:
         try:
-            # Muat dan tampilkan gambar
-            gambar = Image.open(berkas_unggahan)
-            
-            # Konversi ke RGB jika perlu
-            if gambar.mode == 'RGBA':
-                gambar = gambar.convert('RGB')
+            # Load and display the image
+            image = Image.open(uploaded_file)
+            st.image(image, caption='Uploaded Image.', use_column_width=True)
 
-            # Simpan gambar sementara
-            jalur_gambar_sementara = pathlib.Path("gambar_sementara.jpg")
-            gambar.save(jalur_gambar_sementara, format="JPEG")
+            # Convert image to RGB mode if it has an alpha channel
+            if image.mode == 'RGBA':
+                image = image.convert('RGB')
 
-            # Tampilkan gambar
-            st.image(gambar, caption='Gambar Yang Diunggah.', use_container_width=True)
+            # Save the uploaded image temporarily
+            temp_image_path = pathlib.Path("temp_image.jpg")
+            image.save(temp_image_path, format="JPEG")
 
-            if st.button("Generate!"):
+            # Generate UI description
+            if st.button("Code UI"):
                 st.write("🧑‍💻 Looking at your UI...")
                 prompt = "Describe this UI in accurate details. When you reference a UI element put its name and bounding box in the format: [object name (y_min, x_min, y_max, x_max)]. Also Describe the color of the elements."
                 description = send_message_to_model(prompt, temp_image_path)
@@ -193,13 +85,13 @@ def main():
 
                 # Generate HTML
                 st.write("🛠️ Generating website...")
-                html_prompt = f"Create an HTML file based on the following UI description, using the UI elements described in the previous response. Include {framework} CSS within the HTML file to style the elements. Make sure the colors used are the same as the original UI. The UI needs to be responsive and mobile-first, matching the original UI as closely as possible. Do not include any explanations or comments. Avoid using html. and  at the end. ONLY return the HTML code with inline CSS. Here is the refined description: {refined_description}"
+                html_prompt = f"Create an HTML file based on the following UI description, using the UI elements described in the previous response. Include {framework} CSS within the HTML file to style the elements. Make sure the colors used are the same as the original UI. The UI needs to be responsive and mobile-first, matching the original UI as closely as possible. Do not include any explanations or comments. Avoid using ```html. and ``` at the end. ONLY return the HTML code with inline CSS. Here is the refined description: {refined_description}"
                 initial_html = send_message_to_model(html_prompt, temp_image_path)
                 st.code(initial_html, language='html')
 
                 # Refine HTML
                 st.write("🔧 Refining website...")
-                refine_html_prompt = f"Validate the following HTML code based on the UI description and image and provide a refined version of the HTML code with {framework} CSS that improves accuracy, responsiveness, and adherence to the original design. ONLY return the refined HTML code with inline CSS. Avoid using html. and  at the end. Here is the initial HTML: {initial_html}"
+                refine_html_prompt = f"Validate the following HTML code based on the UI description and image and provide a refined version of the HTML code with {framework} CSS that improves accuracy, responsiveness, and adherence to the original design. ONLY return the refined HTML code with inline CSS. Avoid using ```html. and ``` at the end. Here is the initial HTML: {initial_html}"
                 refined_html = send_message_to_model(refine_html_prompt, temp_image_path)
                 st.code(refined_html, language='html')
 
@@ -213,5 +105,5 @@ def main():
         except Exception as e:
             st.error(f"An error occurred: {e}")
 
-    if _name_ == "_main_":
-         main()
+if __name__ == "__main__":
+    main()
