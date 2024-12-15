@@ -32,17 +32,15 @@ pengaturan_keamanan = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
 ]
 
-# Nama model
-NAMA_MODEL = "gemini-1.5-pro-latest"
+
 
 # Pilihan kerangka kerja
 kerangka_kerja = "Tailwind"
 
 # Buat model
 model = genai.GenerativeModel(
-    model_name=NAMA_MODEL,
-    safety_settings=pengaturan_keamanan,
-    generation_config=konfigurasi_generasi,
+  model_name="gemini-2.0-flash-exp",
+  generation_config=generation_config,
 )
 
 # Mulai sesi chat
