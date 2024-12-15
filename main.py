@@ -54,6 +54,9 @@ def main():
     st.title("Gemini 1.5 Pro, UI to Code 👨‍💻 ")
     st.subheader('Made with ❤️ by [Skirano](https://x.com/skirano)')
 
+    frameworks = ["Tailwind", "Bootstrap", "Materialize"]
+    selected_framework = st.selectbox("Choose your framework", frameworks)
+
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
