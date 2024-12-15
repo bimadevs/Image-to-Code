@@ -54,7 +54,7 @@ def main():
     st.subheader('Made with ❤️ by [BimaDev](https://instagram.com/biimaa_jo)')
 
     # Framework selection (e.g., Tailwind, Bootstrap, etc.)
-    frameworks = ["Tailwind", "Bootstrap", "Materialize", "Bulma"]
+    frameworks = ["Tailwind", "Bootstrap", "Materialize", "Bulma", "Vanilla CSS"]
     selected_framework = st.radio("Pilih Framework yang ingin kamu gunakan: ",frameworks)
 
     uploaded_file = st.file_uploader("Pilih Gambar Kamu...", type=["jpg", "jpeg", "png"])
@@ -94,7 +94,7 @@ def main():
 
                 # Refine HTML
                 st.write("🔧 Membuat Code...")
-                refine_html_prompt = f"Validate the following HTML code based on the UI description and image and provide a refined version of the HTML code with {selected_framework} CSS that improves accuracy, responsiveness, and adherence to the original design. ONLY return the refined HTML code with inline CSS.DONT DECLARE NAME HTML IN THE FIRST LINE, JUST CODE AVOID USING ```html. and ``` at the end. Here is the initial HTML: {initial_html}"
+                refine_html_prompt = f"Validate the following HTML code based on the UI description and image and provide a refined version of the HTML code with {selected_framework} CSS that improves accuracy, responsiveness, and adherence to the original design. ONLY return the refined HTML code with inline CSS.DONT DECLARE NAME HTML IN THE FIRST LINE, JUST CODE AVOID USING ```html. and ``` at the end. if there is an image used in the code, use a dummy image. Here is the initial HTML: {initial_html}"
                 refined_html = send_message_to_model(refine_html_prompt, temp_image_path)
                 st.code(refined_html, language='html')
 
