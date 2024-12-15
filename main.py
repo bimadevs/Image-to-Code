@@ -49,8 +49,9 @@ def send_message_to_model(message, image_path):
 
 # Streamlit app
 def main():
-    st.title("Gemini 1.5 Pro, UI to Code 👨‍💻 ")
-    st.subheader('Made with ❤️ by [Skirano](https://x.com/skirano)')
+    st.set_page_config(page_title="Modern UI to Code Tool", layout="centered")
+    st.title("Modern UI From Your Image")
+    st.markdown('Made with ❤️ by [BimaDev](https://instagram.com/biimaa_jo)')
 
     # Framework selection (e.g., Tailwind, Bootstrap, etc.)
     frameworks = ["Tailwind", "Bootstrap", "Materialize", "Bulma"]
