@@ -49,17 +49,17 @@ def send_message_to_model(message, image_path):
     response = chat_session.send_message([message, image_input])
     return response.text
 
-# Streamlit app
-st.set_page_config(page_title="Modern UI to Code Tool", layout="centered")
-st.title("Modern UI to Code Tool")
-st.markdown("An intuitive tool to transform UI images into clean, responsive code using advanced AI.")
-
-# Framework selection
-frameworks = ["Tailwind CSS", "Bootstrap", "Materialize"]
-selected_framework = st.radio("Select your preferred CSS framework:", frameworks, horizontal=True)
-
-# Image upload
-uploaded_file = st.file_uploader("Upload an image of your UI design (JPG, JPEG, PNG):", type=["jpg", "jpeg", "png"])
+    # Streamlit app
+    st.set_page_config(page_title="Modern UI to Code Tool", layout="centered")
+    st.title("Modern UI to Code Tool")
+    st.markdown("An intuitive tool to transform UI images into clean, responsive code using advanced AI.")
+    
+    # Framework selection
+    frameworks = ["Tailwind CSS", "Bootstrap", "Materialize"]
+    selected_framework = st.radio("Select your preferred CSS framework:", frameworks, horizontal=True)
+    
+    # Image upload
+    uploaded_file = st.file_uploader("Upload an image of your UI design (JPG, JPEG, PNG):", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
         try:
