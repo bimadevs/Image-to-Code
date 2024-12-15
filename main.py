@@ -53,8 +53,8 @@ def main():
     st.subheader('Made with ❤️ by [Skirano](https://x.com/skirano)')
 
     # Framework selection (e.g., Tailwind, Bootstrap, etc.)
-    frameworks = ["Tailwind", "Bootstrap", "Materialize"]
-    selected_framework = st.selectbox("Pilih Framework yang ingin kamu gunakan",frameworks)
+    frameworks = ["Tailwind", "Bootstrap", "Materialize", "Bulma"]
+    selected_framework = st.radio("Pilih Framework yang ingin kamu gunakan",frameworks)
 
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
