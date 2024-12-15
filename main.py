@@ -179,55 +179,39 @@ def main():
             # Tampilkan gambar
             st.image(gambar, caption='Gambar Yang Diunggah.', use_container_width=True)
 
-            # Tombol generasi
-            if st.button("Buat Kode!"):
-                st.write("🧑‍💻 Menganalisis Antarmuka Pengguna...")
-                
-                # Deskripsi UI
-                prompt_deskripsi = "Jelaskan antarmuka pengguna ini secara detail. Sebutkan elemen UI dengan nama dan kotak pembatas dalam format: [nama objek (y_min, x_min, y_max, x_max)]. Jelaskan warna dan tata letak."
-                deskripsi = kirim_pesan_ke_model(prompt_deskripsi, jalur_gambar_sementara)
-                st.write(deskripsi)
+                       if st.button("Generate!"):
+                st.write("🧑‍💻 Looking at your UI...")
+                prompt = "Describe this UI in accurate details. When you reference a UI element put its name and bounding box in the format: [object name (y_min, x_min, y_max, x_max)]. Also Describe the color of the elements."
+                description = send_message_to_model(prompt, temp_image_path)
+                st.write(description)
 
-                # Perbaiki deskripsi
-                st.write("🔍 Menyempurnakan deskripsi...")
-                prompt_perbaikan = f"Validasi dan perbaiki deskripsi antarmuka pengguna ini. Bandingkan dengan gambar asli untuk akurasi: {deskripsi}"
-                deskripsi_disempurnakan = kirim_pesan_ke_model(prompt_perbaikan, jalur_gambar_sementara)
-                st.write(deskripsi_disempurnakan)
+                # Refine the description
+                st.write("🔍 Refining description with visual comparison...")
+                refine_prompt = f"Compare the described UI elements with the provided image and identify any missing elements or inaccuracies. Also Describe the color of the elements. Provide a refined and accurate description of the UI elements based on this comparison. Here is the initial description: {description}"
+                refined_description = send_message_to_model(refine_prompt, temp_image_path)
+                st.write(refined_description)
 
-                  # Generate HTML
+                # Generate HTML
                 st.write("🛠️ Generating website...")
-                html_prompt = f"Create an HTML file based on the following UI description, using the UI elements described in the previous response. Include {framework} CSS within the HTML file to style the elements. Make sure the colors used are the same as the original UI. The UI needs to be responsive and mobile-first, matching the original UI as closely as possible. Do not include any explanations or comments. Avoid using ```html. and ``` at the end. ONLY return the HTML code with inline CSS. Here is the refined description: {deskripsi_disempurnakan}"
-                initial_html = kirim_pesan_ke_model(html_prompt, jalur_gambar_sementara)
+                html_prompt = f"Create an HTML file based on the following UI description, using the UI elements described in the previous response. Include {framework} CSS within the HTML file to style the elements. Make sure the colors used are the same as the original UI. The UI needs to be responsive and mobile-first, matching the original UI as closely as possible. Do not include any explanations or comments. Avoid using html. and  at the end. ONLY return the HTML code with inline CSS. Here is the refined description: {refined_description}"
+                initial_html = send_message_to_model(html_prompt, temp_image_path)
                 st.code(initial_html, language='html')
 
                 # Refine HTML
                 st.write("🔧 Refining website...")
-                refine_html_prompt = f"Validate the following HTML code based on the UI description and image and provide a refined version of the HTML code with {framework} CSS that improves accuracy, responsiveness, and adherence to the original design.Do not include any explanations or comments. Avoid using ```html. and ``` at the end. ONLY return the HTML code with inline CSS. Here is the initial HTML: {initial_html}"
-                refined_html = kirim_pesan_ke_model(refine_html_prompt, jalur_gambar_sementara)
-                
-                # Buat HTML
-                # st.write("🛠️ Membuat website responsif...")
-                # prompt_html = f"Buat HTML responsif menggunakan CSS {kerangka_kerja_dipilih}. Cocokkan warna dan tata letak UI asli secara tepat. Tanpa komentar dan penjelasan apa pun hanya berikan output code html saja, jangan pernah mengeluarkan output  ```html diawal dan ``` di akhir. HTML murni dengan CSS inline. Deskripsi: {deskripsi_disempurnakan}"
-                # html_awal = kirim_pesan_ke_model(prompt_html, jalur_gambar_sementara)
-                
-                # Tampilkan kode HTML
+                refine_html_prompt = f"Validate the following HTML code based on the UI description and image and provide a refined version of the HTML code with {framework} CSS that improves accuracy, responsiveness, and adherence to the original design. ONLY return the refined HTML code with inline CSS. Avoid using html. and  at the end. Here is the initial HTML: {initial_html}"
+                refined_html = send_message_to_model(refine_html_prompt, temp_image_path)
                 st.code(refined_html, language='html')
-                
-                # Simpan berkas HTML
-                with open("ui_dihasilkan.html", "w", encoding='utf-8') as f:
-                    f.write(refined_html)
-                
-                # Tombol unduh
-                st.download_button(
-                    label="Unduh HTML", 
-                    data=refined_html, 
-                    file_name="index.html", 
-                    mime="text/html"
-                )
 
+                # Save the refined HTML to a file
+                with open("index.html", "w") as file:
+                    file.write(refined_html)
+                st.success("HTML file 'index.html' has been created.")
+
+                # Provide download link for HTML
+                st.download_button(label="Download HTML", data=refined_html, file_name="index.html", mime="text/html")
         except Exception as e:
-            logger.error(f"Kesalahan pemrosesan gambar: {e}")
-            st.error(f"Terjadi kesalahan: {e}")
+            st.error(f"An error occurred: {e}")
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
