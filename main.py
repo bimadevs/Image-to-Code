@@ -16,7 +16,7 @@ API_KEY = 'AIzaSyDvln1q95RRWxaER0fSMlqoaWsA1UU6lvs'  # Silakan ganti dengan API 
 genai.configure(api_key=API_KEY)
 
 # Konfigurasi generasi
-konfigurasi_generasi = {
+generation_config = {
     "temperature": 0,
     "top_p": 0.85,
     "top_k": 40,
