@@ -192,6 +192,7 @@ def main():
                 st.write("🔍 Menyempurnakan deskripsi...")
                 prompt_perbaikan = f"Validasi dan perbaiki deskripsi antarmuka pengguna ini. Bandingkan dengan gambar asli untuk akurasi: {deskripsi}"
                 deskripsi_disempurnakan = kirim_pesan_ke_model(prompt_perbaikan, jalur_gambar_sementara)
+                st.write(deskripsi_disempurnakan)
 
                   # Generate HTML
                 st.write("🛠️ Generating website...")
