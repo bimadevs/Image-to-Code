@@ -74,7 +74,7 @@ def main():
             image.save(temp_image_path, format="JPEG")
 
             # Generate UI description
-            if st.button("Code UI"):
+            if st.button("Generate to code"):
                 st.write("🧑‍💻 Looking at your UI...")
                 prompt = "Describe this UI in accurate details. When you reference a UI element put its name and bounding box in the format: [object name (y_min, x_min, y_max, x_max)]. Also Describe the color of the elements."
                 description = send_message_to_model(prompt, temp_image_path)
