@@ -63,7 +63,7 @@ def main():
         try:
             # Load and display the image
             image = Image.open(uploaded_file)
-            st.image(image, caption='Uploaded Image.', use_container_width=True)
+            st.image(image, caption='Uploaded Image.', use_column_width=True)
 
             # Convert image to RGB mode if it has an alpha channel
             if image.mode == 'RGBA':
@@ -75,33 +75,33 @@ def main():
 
             # Generate UI description
             if st.button("Code UI"):
-                st.write("🧑‍💻 Melihat gambar kamu")
+                st.write("🧑‍💻 Looking at your UI...")
                 prompt = "Describe this UI in accurate details. When you reference a UI element put its name and bounding box in the format: [object name (y_min, x_min, y_max, x_max)]. Also Describe the color of the elements."
                 description = send_message_to_model(prompt, temp_image_path)
-               # st.write(description)
+                st.write(description)
 
                 # Refine the description
-                st.write("🔍 Identifikasi gambar kamu")
+                st.write("🔍 Refining description with visual comparison...")
                 refine_prompt = f"Compare the described UI elements with the provided image and identify any missing elements or inaccuracies. Also Describe the color of the elements. Provide a refined and accurate description of the UI elements based on this comparison. Here is the initial description: {description}"
                 refined_description = send_message_to_model(refine_prompt, temp_image_path)
-               # st.write(refined_description)
+                st.write(refined_description)
 
                 # Generate HTML
-                st.write("🛠️ Membuat rencana...")
-                html_prompt = f"Create an HTML file based on the following UI description, using the UI elements described in the previous response. Include {selected_framework} CSS within the HTML file to style the elements. Make sure the colors used are the same as the original UI. The UI needs to be responsive and mobile-first, matching the original UI as closely as possible. Do not include any explanations or comments. Avoid using ```html. and ``` at the end. ONLY return the HTML code with inline CSS. Here is the refined description: {refined_description}"
+                st.write("🛠️ Generating website...")
+                html_prompt = f"Create an HTML file based on the following UI description, using the UI elements described in the previous response. Include {framework} CSS within the HTML file to style the elements. Make sure the colors used are the same as the original UI. The UI needs to be responsive and mobile-first, matching the original UI as closely as possible. Do not include any explanations or comments. Avoid using ```html. and ``` at the end. ONLY return the HTML code with inline CSS. Here is the refined description: {refined_description}"
                 initial_html = send_message_to_model(html_prompt, temp_image_path)
-                #st.code(initial_html, language='html')
+                st.code(initial_html, language='html')
 
                 # Refine HTML
-                st.write("🔧 Membuat Code...")
-                refine_html_prompt = f"Validate the following HTML code based on the UI description and image and provide a refined version of the HTML code with {selected_framework} CSS that improves accuracy, responsiveness, and adherence to the original design. ONLY return the refined HTML code with inline CSS.DONT DECLARE NAME HTML IN THE FIRST LINE, JUST CODE AVOID USING ```html. and ``` at the end. if there is an image used in the code, use a dummy image. Here is the initial HTML: {initial_html}"
+                st.write("🔧 Refining website...")
+                refine_html_prompt = f"Validate the following HTML code based on the UI description and image and provide a refined version of the HTML code with {framework} CSS that improves accuracy, responsiveness, and adherence to the original design. ONLY return the refined HTML code with inline CSS. Avoid using ```html. and ``` at the end. Here is the initial HTML: {initial_html}"
                 refined_html = send_message_to_model(refine_html_prompt, temp_image_path)
                 st.code(refined_html, language='html')
 
                 # Save the refined HTML to a file
                 with open("index.html", "w") as file:
                     file.write(refined_html)
-                st.success("file HTML telah dibuat, Silahkan Download")
+                st.success("HTML file 'index.html' has been created.")
 
                 # Provide download link for HTML
                 st.download_button(label="Download HTML", data=refined_html, file_name="index.html", mime="text/html")
