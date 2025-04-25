@@ -17,7 +17,7 @@ pip install -r requirements.txt
 To run the app, use the following command:
 
 ```
-streamlit run app.py
+streamlit run main.py
 ```
 
 ## Configuration
