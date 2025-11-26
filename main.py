@@ -5,25 +5,38 @@ from PIL import Image
 import google.generativeai as genai
 
 def load_api_key():
-    """Load API key from config.toml file"""
+    """Load API key dengan prioritas: env var > config.toml"""
+    
+    # Priority 1: Environment variable (untuk deployment)
+    import os
+    env_api_key = os.getenv("GOOGLE_API_KEY")
+    if env_api_key:
+        return env_api_key
+    
+    # Priority 2: config.toml (untuk development lokal)
     try:
         config_path = pathlib.Path("config.toml")
         if config_path.exists():
             with open(config_path, "r", encoding="utf-8") as f:
                 config = toml.load(f)
                 return config.get("google_api", {}).get("GOOGLE_API_KEY")
-        else:
-            # Fallback to environment variable if config.toml not found
-            import os
-            return os.getenv("GOOGLE_API_KEY")
     except Exception as e:
-        st.error(f"Error loading configuration: {e}")
-        return None
+        st.error(f"Error loading config.toml: {e}")
+    
+    return None
 
-# Load API key from config file
+# Load API key dengan multiple fallback
 API_KEY = load_api_key()
 if not API_KEY:
-    st.error("API Key tidak ditemukan! Pastikan file config.toml sudah ada dengan konfigurasi yang benar.")
+    error_msg = """🔑 API Key tidak ditemukan!
+
+**Cara setting API Key:**
+
+1. **Deployment (Streamlit Cloud):** Gunakan Streamlit secrets di .streamlit/secrets.toml
+2. **Environment:** Set environment variable GOOGLE_API_KEY  
+3. **Development:** Edit config.toml dengan API key Anda"""
+    
+    st.error(error_msg)
     st.stop()
 
 genai.configure(api_key=API_KEY)

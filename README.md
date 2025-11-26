@@ -69,7 +69,20 @@ pip install streamlit Pillow google-generativeai python-dotenv toml streamlit-op
 
 ### 4. **Configure API Key**
 
-**Option 1: TOML Configuration (Direkomendasikan)**
+**Option 1: Streamlit Secrets (Untuk Deployment - Direkomendasikan)**
+```bash
+# Buat file .streamlit/secrets.toml
+mkdir -p .streamlit
+nano .streamlit/secrets.toml
+```
+
+Template `.streamlit/secrets.toml`:
+```toml
+[google_api]
+GOOGLE_API_KEY = "your_google_api_key_here"
+```
+
+**Option 2: TOML Configuration (Untuk Development Lokal)**
 ```bash
 # File config.toml sudah disediakan
 # Edit config.toml dengan API key Anda:
@@ -79,27 +92,19 @@ nano config.toml
 Template `config.toml`:
 ```toml
 [google_api]
-# Google Gemini AI Configuration
-# Dapatkan API key dari: https://makersuite.google.com/app/apikey
 GOOGLE_API_KEY = "your_google_api_key_here"
 ```
 
-**Option 1: Environment Variable**
+**Option 3: Environment Variable**
 ```bash
+# Set environment variable
 export GOOGLE_API_KEY="your_google_api_key_here"
 ```
 
-**Option 2: .env file**
+**Option 4: .env file**
 ```bash
 # Edit file .env
 GOOGLE_API_KEY=your_actual_api_key_here
-```
-
-**Option 3: Streamlit Secrets (untuk deployment)**
-```bash
-# Buat file .streamlit/secrets.toml
-[google_api_key]
-GOOGLE_API_KEY = "your_google_api_key_here"
 ```
 
 ### 5. **Run Application**
@@ -118,6 +123,15 @@ GOOGLE_API_KEY = "your_google_api_key_here"
 ```
 
 Konfigurasi lainnya (model name, generation settings) terdapat di dalam `main.py` karena bukan informasi rahasia.
+
+### **API Key Loading Priority**
+Aplikasi menggunakan prioritas berikut untuk mencari API key:
+
+1. **Environment Variable** (`GOOGLE_API_KEY`) - Untuk deployment dan development
+2. **TOML File** (`config.toml`) - Untuk development lokal
+3. **Fallback Error** - Jika tidak ada yang ditemukan
+
+**Catatan**: Streamlit secrets akan digunakan otomatis saat di deployment di Streamlit Cloud.
 
 ### **Environment Variables**
 ```bash
@@ -261,9 +275,41 @@ def process_uploaded_image(uploaded_file):
 
 ### **Common Issues**
 
-#### **1. TOML Configuration Error**
+#### **1. Streamlit Cloud Deployment Error**
 ```
- Error: TOML file tidak ditemukan atau error parsing
+ Error: API Key tidak ditemukan! (saat deploy di Streamlit Cloud)
+```
+**Solution:**
+```bash
+# Streamlit Cloud akan otomatis menggunakan .streamlit/secrets.toml
+# Pastikan format secrets.toml benar:
+mkdir -p .streamlit
+
+# Gunakan format TOML yang benar
+[google_api]
+GOOGLE_API_KEY = "your_google_api_key_here"
+
+# ATAU set via Streamlit Cloud dashboard:
+# Settings > Secrets > Add secret
+# Name: GOOGLE_API_KEY
+# Value: your_google_api_key_here
+```
+
+#### **2. Environment Variable Error (saat deployment lain)**
+```
+ Error: API Key tidak ditemukan! (saat deployment di platform lain)
+```
+**Solution:**
+```bash
+# Set environment variable di platform deployment
+# Heroku: heroku config:set GOOGLE_API_KEY=your_key
+# Railway: Set di dashboard environment variables
+# Docker: docker run -e GOOGLE_API_KEY=your_key ...
+```
+
+#### **2. TOML Configuration Error**
+```
+ Error: TOML file tidak ditemukan atau error parsing (saat development)
 ```
 **Solution:**
 ```bash
@@ -371,9 +417,9 @@ jobs:
         with:
           python-version: '3.9'
       - name: Install dependencies
-        run: pip install -r requirements_improved.txt
+        run: pip install -r requirements.txt
       - name: Generate code
-        run: streamlit run improved_main.py
+        run: streamlit run main.py
 ```
 
 **With CI/CD:**
@@ -422,13 +468,13 @@ pre-commit install
 pytest tests/
 
 # Format code
-black improved_main.py
+black main.py
 
 # Lint code
-flake8 improved_main.py
+flake8 main.py
 
 # Type checking
-mypy improved_main.py
+mypy main.py
 ```
 
 ##  **License**
