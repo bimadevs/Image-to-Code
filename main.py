@@ -1,13 +1,34 @@
 import streamlit as st
 import pathlib
+import toml
 from PIL import Image
 import google.generativeai as genai
 
-# Configure the API key directly in the script
-API_KEY = 'AIzaSyBA8tc28tq92GjX3rqxCi_w4yHxoUCuc2I'
+def load_api_key():
+    """Load API key from config.toml file"""
+    try:
+        config_path = pathlib.Path("config.toml")
+        if config_path.exists():
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = toml.load(f)
+                return config.get("google_api", {}).get("GOOGLE_API_KEY")
+        else:
+            # Fallback to environment variable if config.toml not found
+            import os
+            return os.getenv("GOOGLE_API_KEY")
+    except Exception as e:
+        st.error(f"Error loading configuration: {e}")
+        return None
+
+# Load API key from config file
+API_KEY = load_api_key()
+if not API_KEY:
+    st.error("API Key tidak ditemukan! Pastikan file config.toml sudah ada dengan konfigurasi yang benar.")
+    st.stop()
+
 genai.configure(api_key=API_KEY)
 
-# Generation configuration
+# Generation configuration (non-sensitive config, can be hardcoded)
 generation_config = {
   "temperature": 1,
   "top_p": 0.95,
@@ -24,8 +45,8 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-# Model name
-MODEL_NAME = "gemini-2.0-flash-exp"
+# Model name (non-sensitive config, can be hardcoded)
+MODEL_NAME = "gemini-2.5-pro"
 
 
 # Create the model
