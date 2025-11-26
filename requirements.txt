@@ -2,8 +2,6 @@
 streamlit>=1.28.0
 Pillow>=10.0.0
 google-generativeai>=0.3.0
-python-dotenv>=1.0.0
 requests>=2.31.0
 streamlit-option-menu>=0.3.6
 streamlit-agraph>=0.0.45
-toml>=0.10.2

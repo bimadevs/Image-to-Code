@@ -18,9 +18,8 @@
 - **Layout understanding**: Grid, flexbox, dan absolute positioning
 
 ### 🛡️ **Enhanced Security**
-- **TOML Configuration**: API key disimpan dalam file konfigurasi terstruktur
-- **Environment variable support**: Fallback ke environment variables jika TOML tidak tersedia
-- **No hardcoded secrets**: API key tidak lagi hardcode dalam source code
+- **Simple configuration**: API key di-hardcode untuk kemudahan penggunaan
+- **No external dependencies**: Tidak memerlukan environment variables atau file konfigurasi
 - **Secure error handling**: Error handling yang aman tanpa expose sensitive information
 - **Input validation**: Validasi input yang comprehensive
 
@@ -45,18 +44,7 @@ cd image-to-code
 ```
 
 ### 2. **Setup Environment**
-```bash
-# Copy environment template
-cp .env.example .env
-
-# TOML Configuration (Rekomendasi)
-# File config.toml sudah disediakan dengan template default
-# Edit config.toml dengan API key Anda:
-# nano config.toml
-
-# ATAU menggunakan environment variable
-export GOOGLE_API_KEY="your_google_api_key_here"
-```
+Tidak ada setup environment khusus diperlukan. API key sudah di-hardcode di source code.
 
 ### 3. **Install Dependencies**
 ```bash
@@ -64,48 +52,16 @@ export GOOGLE_API_KEY="your_google_api_key_here"
 pip install -r requirements.txt
 
 # ATAU install manual
-pip install streamlit Pillow google-generativeai python-dotenv toml streamlit-option-menu
+pip install streamlit Pillow google-generativeai streamlit-option-menu
 ```
 
-### 4. **Configure API Key**
+**Cara mendapatkan API Key (untuk referensi):**
+1. Kunjungi [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Login dengan akun Google Anda
+3. Klik "Create API Key"
+4. Copy API key yang dihasilkan
 
-**Option 1: Streamlit Secrets (Untuk Deployment - Direkomendasikan)**
-```bash
-# Buat file .streamlit/secrets.toml
-mkdir -p .streamlit
-nano .streamlit/secrets.toml
-```
-
-Template `.streamlit/secrets.toml`:
-```toml
-[google_api]
-GOOGLE_API_KEY = "your_google_api_key_here"
-```
-
-**Option 2: TOML Configuration (Untuk Development Lokal)**
-```bash
-# File config.toml sudah disediakan
-# Edit config.toml dengan API key Anda:
-nano config.toml
-```
-
-Template `config.toml`:
-```toml
-[google_api]
-GOOGLE_API_KEY = "your_google_api_key_here"
-```
-
-**Option 3: Environment Variable**
-```bash
-# Set environment variable
-export GOOGLE_API_KEY="your_google_api_key_here"
-```
-
-**Option 4: .env file**
-```bash
-# Edit file .env
-GOOGLE_API_KEY=your_actual_api_key_here
-```
+**Catatan**: Jika Anda ingin menggunakan API key sendiri, edit file `main.py` dan ganti nilai `API_KEY` di baris 7.
 
 ### 5. **Run Application**
 ```bash
@@ -114,44 +70,25 @@ streamlit run main.py
 
 ##  **Configuration**
 
-### **TOML Configuration (Recommended)**
-Aplikasi ini menggunakan file `config.toml` untuk menyimpan API key secara aman:
+### **API Key Configuration**
+API key sudah di-hardcode di dalam file `main.py` untuk kemudahan penggunaan:
 
-```toml
-[google_api]
-GOOGLE_API_KEY = "your_google_api_key_here"
+```python
+# main.py line 6-7
+API_KEY = 'AIzaSyDRPIDUknWMrK4EC-Wdj1YBwuEBzsVUtWc'
+genai.configure(api_key=API_KEY)
 ```
 
-Konfigurasi lainnya (model name, generation settings) terdapat di dalam `main.py` karena bukan informasi rahasia.
-
-### **API Key Loading Priority**
-Aplikasi menggunakan prioritas berikut untuk mencari API key:
-
-1. **Environment Variable** (`GOOGLE_API_KEY`) - Untuk deployment dan development
-2. **TOML File** (`config.toml`) - Untuk development lokal
-3. **Fallback Error** - Jika tidak ada yang ditemukan
-
-**Catatan**: Streamlit secrets akan digunakan otomatis saat di deployment di Streamlit Cloud.
-
-### **Environment Variables**
-```bash
-GOOGLE_API_KEY=your_google_api_key_here
-STREAMLIT_SERVER_PORT=8501
-STREAMLIT_SERVER_ADDRESS=localhost
-```
-
-### **API Key Setup**
-1. **Dapatkan API Key** dari [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. **Set environment variable** atau gunakan .env file
-3. **Verify configuration** dengan menjalankan app
+Jika Anda ingin menggunakan API key sendiri, edit file `main.py` dan ganti nilai `API_KEY`.
 
 ### **Model Configuration**
 ```python
 GENERATION_CONFIG = {
-    "temperature": 0.3,      # Adjustable berdasarkan quality mode
-    "top_p": 0.9,            # Nucleus sampling
-    "top_k": 40,             # Top-k filtering
-    "max_output_tokens": 8192, # Maximum response length
+    "temperature": 1,           # Controls randomness (0.0 - 2.0)
+    "top_p": 0.95,              # Nucleus sampling (0.0 - 1.0)
+    "top_k": 40,                # Top-k filtering (1 - 100)
+    "max_output_tokens": 8192,  # Maximum response length
+    "response_mime_type": "text/plain",
 }
 ```
 
@@ -275,68 +212,7 @@ def process_uploaded_image(uploaded_file):
 
 ### **Common Issues**
 
-#### **1. Streamlit Cloud Deployment Error**
-```
- Error: API Key tidak ditemukan! (saat deploy di Streamlit Cloud)
-```
-**Solution:**
-```bash
-# Streamlit Cloud akan otomatis menggunakan .streamlit/secrets.toml
-# Pastikan format secrets.toml benar:
-mkdir -p .streamlit
-
-# Gunakan format TOML yang benar
-[google_api]
-GOOGLE_API_KEY = "your_google_api_key_here"
-
-# ATAU set via Streamlit Cloud dashboard:
-# Settings > Secrets > Add secret
-# Name: GOOGLE_API_KEY
-# Value: your_google_api_key_here
-```
-
-#### **2. Environment Variable Error (saat deployment lain)**
-```
- Error: API Key tidak ditemukan! (saat deployment di platform lain)
-```
-**Solution:**
-```bash
-# Set environment variable di platform deployment
-# Heroku: heroku config:set GOOGLE_API_KEY=your_key
-# Railway: Set di dashboard environment variables
-# Docker: docker run -e GOOGLE_API_KEY=your_key ...
-```
-
-#### **2. TOML Configuration Error**
-```
- Error: TOML file tidak ditemukan atau error parsing (saat development)
-```
-**Solution:**
-```bash
-# Check apakah config.toml ada
-ls -la config.toml
-
-# Validate TOML syntax
-python -c "import toml; toml.load('config.toml')"
-
-# Pastikan API key sudah diisi
-grep "GOOGLE_API_KEY" config.toml
-```
-
-#### **2. API Key Error**
-```
- Error: API Key tidak ditemukan!
-```
-**Solution:**
-```bash
-# Check environment variable
-echo $GOOGLE_API_KEY
-
-# Or check .env file
-cat .env
-```
-
-#### **2. Image Processing Error**
+#### **1. Image Processing Error**
 ```
  Error: Format file tidak didukung
 ```
